@@ -50,9 +50,9 @@
      - По прошлому пункту определяем, можем ли мы поместить объект в многоугольник или нет
 ## Пример
 Пример работы:
-'''
+```
 import src.intelligent_placer_lib as ll
 path = os.path.join("train_data", "7.jpeg")
 print(ll.check_image(path))
-'''
+```
 
