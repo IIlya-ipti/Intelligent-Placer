@@ -51,6 +51,8 @@
 ## Пример
 Пример работы:
 '''
-intelligent_placer_lib.py
+import src.intelligent_placer_lib as ll
+path = os.path.join("train_data", "7.jpeg")
+print(ll.check_image(path))
 '''
 
