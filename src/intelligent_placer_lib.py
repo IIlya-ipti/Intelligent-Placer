@@ -3,28 +3,33 @@ import imageio.v2 as imageio
 import src.algorithms as alg
 import src.photo_preprocessing as pp
 
-def check_image(path_to_png_jpg_image_on_local_computer):
+
+def check_image(path_to_png_jpg_image_on_local_computer) -> bool:
+    """
+    :param path_to_png_jpg_image_on_local_computer: path image
+    :return: does the objects fit into the polygon or not
+    """
     ##
     image = imageio.imread(path_to_png_jpg_image_on_local_computer)
-    image = cv2.resize(image, (112,208))
+    image = cv2.resize(image, (112, 208))
 
-    a,b = pp.get_masks(image)
+    a, b = pp.get_masks(image)
 
     try:
-        polygon = pp.get_poly(image,b[0])
+        polygon = pp.get_poly(image, b[0])
         polygon = polygon.astype("float")
     except Exception as e:
         print("polygon not found")
-    
+
     if len(b) == 1:
         print("without objects!!(canny not detected)")
-    for i in b: 
+    for i in b:
         # 0 is polygon
-        if i == 0:continue
+        if i == 0: continue
         all_valls = pp.get_width_height(b[i])
         wid = all_valls["width"]
         hi = all_valls["height"]
-        if alg.add_block(hi,wid,polygon) == False:
+        if not alg.add_block(hi, wid, polygon):
             return False
-        
+
     return True

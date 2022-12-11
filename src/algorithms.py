@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def max_rect(a):
+def max_width(a):
     v = [0 for i in range(len(a))]
     stack = []
     for i in range(len(a)):
@@ -22,15 +22,26 @@ def max_rect(a):
     return v
 
 
-def total_max_rect(a):
-    first = max_rect(a)
-    second = max_rect(a[::-1])[::-1]
+def total_max_width(a):
+    """
+    :param a: array of integers
+    :return: max width of array of all value
+    """
+    first = max_width(a)
+    second = max_width(a[::-1])[::-1]
     for i in range(len(second)):
         first[i] += second[i] - 1
     return np.array(first)
 
 
 def add_block(wid, hi, polygon):
+    """
+    :param wid: width of rectangle
+    :param hi:  height of rectangle
+    :param polygon: the polygon where we want to put
+    :return: polygon with rect and true/false (can be placed or not)
+    """
+
     # MAIN ALG FOR ADD BLOCK
     polygon_width = polygon.copy()
     for j in range(polygon.shape[1] - 1, -1, -1):
@@ -43,7 +54,7 @@ def add_block(wid, hi, polygon):
         polygon_one = polygon_width[i]
         inds_wid = polygon_one >= wid
         inds_hi = polygon_one >= hi
-        polygon_two = total_max_rect(polygon_one)
+        polygon_two = total_max_width(polygon_one)
 
         vls_first = polygon_two[inds_wid]
         vls_first = vls_first[vls_first >= hi]
