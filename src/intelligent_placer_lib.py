@@ -1,22 +1,7 @@
-# для вывода графики
-# операции над матрицами
-
-# загрузка и сохранение изображений
-
-# работа над изображениями
-# импортируем функцию label под другим именем, чтобы не терять её, если появляется переменная label
 import cv2
 import imageio.v2 as imageio
 import src.algorithms as alg
 import src.photo_preprocessing as pp
-
-
-import matplotlib.pyplot as plt
-
-
-# вывод
-# работа с таблицами
-# для работы с путями к файлам
 
 def check_image(path_to_png_jpg_image_on_local_computer):
     ##

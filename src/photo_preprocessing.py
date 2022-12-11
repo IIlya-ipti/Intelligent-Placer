@@ -2,11 +2,9 @@ import cv2
 import cv2 as cv
 import numpy as np
 from keras.models import load_model
-# работа над изображениями
 from skimage.color import rgb2gray
 from skimage.feature import canny
 from skimage.filters import sobel
-# импортируем функцию label под другим именем, чтобы не терять её, если появляется переменная label
 from skimage.measure import label as sk_measure_label
 from skimage.measure import regionprops
 from skimage.morphology import binary_closing, binary_erosion
