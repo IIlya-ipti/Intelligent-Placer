@@ -89,7 +89,6 @@ def get_masks(photo):
     for j in range(1, len(polygons)):
         if polygons[j] > 100:
             mask = get_mask_object(photo, largest=True, ind_of_polygon=j)[0]
-            # rint("j == ",j)
             for i in range(1, 11):
                 k = mask * predict_mask[0, :, :, i].reshape(208, 112)
                 k = k > LOW_P_FOR_MODEL_CLASSIFICATION
@@ -105,17 +104,40 @@ def get_masks(photo):
 
     return probability_of_class, masks
 
+import cv2
 
-def rotate_image(image, angle):
+def rotate_image(mat, angle):
     """
-    :param image:
-    :param angle:
-    :return: rotated image
+    Rotates an image (angle in degrees) and expands image to avoid cropping
     """
-    image_center = tuple(np.array(image.shape[1::-1]) / 2)
-    rot_mat = cv2.getRotationMatrix2D(image_center, angle, 1.0)
-    result = cv2.warpAffine(image, rot_mat, image.shape[1::-1], flags=cv2.INTER_LINEAR)
-    return result
+
+    height, width = mat.shape[:2] # image shape has 3 dimensions
+    image_center = (width/2, height/2) # getRotationMatrix2D needs coordinates in reverse order (width, height) compared to shape
+
+    rotation_mat = cv2.getRotationMatrix2D(image_center, angle, 1.)
+
+    # rotation calculates the cos and sin, taking absolutes of those.
+    abs_cos = abs(rotation_mat[0,0]) 
+    abs_sin = abs(rotation_mat[0,1])
+
+    # find the new width and height bounds
+    bound_w = int(height * abs_sin + width * abs_cos)
+    bound_h = int(height * abs_cos + width * abs_sin)
+
+    # subtract old image center (bringing image back to origo) and adding the new image center coordinates
+    rotation_mat[0, 2] += bound_w/2 - image_center[0]
+    rotation_mat[1, 2] += bound_h/2 - image_center[1]
+
+    # rotate image with the new bounds and translated rotation matrix
+    rotated_mat = cv2.warpAffine(mat, rotation_mat, (bound_w, bound_h))
+    
+    # to ones
+   # rotated_mat = rotated_mat.where(rotated_mat > 0.4, 1)
+    #plt.imshow(rotated_mat)
+    
+    return rotated_mat
+
+
 
 
 def get_poly(photo, numpy_poly):
