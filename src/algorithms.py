@@ -61,21 +61,35 @@ def add_block(wid, hi, polygon):
 
         vls_second = polygon_two[inds_hi]
         vls_second = vls_second[vls_second >= wid]
-
+        
+        
         if len(vls_first) > 0:
+            ind = np.where(polygon_two == vls_first[0])[0][0]
+            ind_first = ind
+            while True:
+                ind_first -= 1
+                if polygon_one[ind_first] < wid:
+                    ind_first += 1
+                    break  
+                if ind_first == 0:
+                    break
+            
             for i_1 in range(i, i - wid, -1):
-                ind = np.where(polygon_two == vls_first[0])[0][0]
-                for j_1 in range(ind, ind + hi - 1):
-                    if i_1 >= 0 and i_1 < len(polygon) and j_1 >= 0 and j_1 < len(polygon[0]):
-                        polygon[i_1][j_1] = 0
-
-
+                for j_1 in range(ind_first, ind_first + hi - 1):
+                    polygon[i_1][j_1] = 0
         elif len(vls_second) > 0:
             ind = np.where(polygon_two == vls_second[0])[0][0]
+            ind_first = ind
+            while True:
+                ind_first -= 1
+                if polygon_one[ind_first] < hi:
+                    ind_first += 1
+                    break     
+                if ind_first == 0:
+                    break
             for i_1 in range(i, i - hi, -1):
-                for j_1 in range(ind, ind + wid - 1):
-                    if i_1 >= 0 and i_1 < len(polygon) and j_1 >= 0 and j_1 < len(polygon[0]):
-                        polygon[i_1][j_1] = 0
+                for j_1 in range(ind_first, ind_first + wid - 1):
+                    polygon[i_1][j_1] = 0
         if len(vls_first) + len(vls_second) > 0:
             return True
     return False
