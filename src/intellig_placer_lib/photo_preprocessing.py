@@ -85,7 +85,9 @@ def get_masks(photo):
     MIN_P_FOR_CLASSIFICATION = 0.2
     polygons = get_mask_object(photo, largest=True, ind_of_polygon=0)[1]
     probability_of_class = []
+    masks_not_null = list()
     masks = {}
+
     for j in range(1, len(polygons)):
         if polygons[j] > 100:
             mask = get_mask_object(photo, largest=True, ind_of_polygon=j)[0]
@@ -96,48 +98,45 @@ def get_masks(photo):
                 # print(p_var)
                 if p_var > MIN_P_FOR_CLASSIFICATION:
                     probability_of_class.append(i)
-                    masks[i] = mask
+                    masks_not_null.append((i, mask))
                     break
             else:
                 masks[0] = mask
                 probability_of_class.append(0)
+    return probability_of_class, masks_not_null, masks
 
-    return probability_of_class, masks
-
-import cv2
 
 def rotate_image(mat, angle):
     """
     Rotates an image (angle in degrees) and expands image to avoid cropping
     """
 
-    height, width = mat.shape[:2] # image shape has 3 dimensions
-    image_center = (width/2, height/2) # getRotationMatrix2D needs coordinates in reverse order (width, height) compared to shape
+    height, width = mat.shape[:2]  # image shape has 3 dimensions
+    image_center = (
+    width / 2, height / 2)  # getRotationMatrix2D needs coordinates in reverse order (width, height) compared to shape
 
     rotation_mat = cv2.getRotationMatrix2D(image_center, angle, 1.)
 
     # rotation calculates the cos and sin, taking absolutes of those.
-    abs_cos = abs(rotation_mat[0,0]) 
-    abs_sin = abs(rotation_mat[0,1])
+    abs_cos = abs(rotation_mat[0, 0])
+    abs_sin = abs(rotation_mat[0, 1])
 
     # find the new width and height bounds
     bound_w = int(height * abs_sin + width * abs_cos)
     bound_h = int(height * abs_cos + width * abs_sin)
 
     # subtract old image center (bringing image back to origo) and adding the new image center coordinates
-    rotation_mat[0, 2] += bound_w/2 - image_center[0]
-    rotation_mat[1, 2] += bound_h/2 - image_center[1]
+    rotation_mat[0, 2] += bound_w / 2 - image_center[0]
+    rotation_mat[1, 2] += bound_h / 2 - image_center[1]
 
     # rotate image with the new bounds and translated rotation matrix
     rotated_mat = cv2.warpAffine(mat, rotation_mat, (bound_w, bound_h))
-    
+
     # to ones
-   # rotated_mat = rotated_mat.where(rotated_mat > 0.4, 1)
-    #plt.imshow(rotated_mat)
-    
+    # rotated_mat = rotated_mat.where(rotated_mat > 0.4, 1)
+    # plt.imshow(rotated_mat)
+
     return rotated_mat
-
-
 
 
 def get_poly(photo, numpy_poly):
