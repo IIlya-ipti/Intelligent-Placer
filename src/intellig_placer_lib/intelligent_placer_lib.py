@@ -1,7 +1,7 @@
 import cv2
 import imageio.v2 as imageio
-import src.algorithms as alg
-import src.photo_preprocessing as pp
+from .algorithms import add_block
+from .photo_preprocessing import *
 import matplotlib.pyplot as plt
 from scipy.ndimage.interpolation import rotate
 import numpy as np
@@ -26,31 +26,29 @@ def check_image(path_to_png_jpg_image_on_local_computer) -> bool:
     image = imageio.imread(path_to_png_jpg_image_on_local_computer)
     image = cv2.resize(image, (112, 208))
 
-    a, b = pp.get_masks(image)
-
+    _, all_objects, polygon__mask = get_masks(image)
     try:
-        polygon = pp.get_poly(image, b[0])
+        polygon = get_poly(image,  polygon__mask[0])
         polygon = polygon.astype("float32")
     except Exception as e:
         print("polygon not found")
-    print("number of objects: ",len(b))
-    if len(b) == 1:
+    print("number of objects (without polygon): ",len(all_objects))
+    if len(all_objects) == 0:
         print("without objects!!(canny not detected)")
-    for i in b:
+    for j in all_objects:
         # 0 is polygon
-        if i == 0: continue
-        all_valls = pp.get_width_height(b[i])
+        all_valls = get_width_height(j[1])
         wid = all_valls["width"]
         hi = all_valls["height"]
         
         flag = False
         
         # rotate object 
-        for i in range(0,90,20):
-            if alg.add_block(hi, wid, polygon):
+        for i in range(0,90,15):
+            if add_block(hi, wid, polygon):
                 flag = True
                 break
-            polygon = delete_nulls(pp.rotate_image(polygon,20))
+            polygon = delete_nulls(rotate_image(polygon,15))
         if flag == False:
             return False
     plt.imshow(polygon)

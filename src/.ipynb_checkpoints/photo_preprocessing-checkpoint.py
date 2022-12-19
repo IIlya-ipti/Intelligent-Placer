@@ -85,7 +85,9 @@ def get_masks(photo):
     MIN_P_FOR_CLASSIFICATION = 0.2
     polygons = get_mask_object(photo, largest=True, ind_of_polygon=0)[1]
     probability_of_class = []
+    masks_not_null = list()
     masks = {}
+    
     for j in range(1, len(polygons)):
         if polygons[j] > 100:
             mask = get_mask_object(photo, largest=True, ind_of_polygon=j)[0]
@@ -96,15 +98,12 @@ def get_masks(photo):
                 # print(p_var)
                 if p_var > MIN_P_FOR_CLASSIFICATION:
                     probability_of_class.append(i)
-                    masks[i] = mask
+                    masks_not_null.append((i,mask))
                     break
             else:
                 masks[0] = mask
                 probability_of_class.append(0)
-
-    return probability_of_class, masks
-
-import cv2
+    return probability_of_class, masks_not_null, masks
 
 def rotate_image(mat, angle):
     """
